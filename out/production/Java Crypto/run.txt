@@ -1,0 +1,2 @@
+java -cp JavaCryptography.jar Encrypt 123456 avivks.jks aviv or plaintext.txt
+java -cp JavaCryptography.jar Decrypt 123456 orks.jks aviv or encrypted.txt decrypted.txt
