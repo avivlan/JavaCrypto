@@ -29,7 +29,7 @@ public class Decrypt {
             KeyStore keyStoreB = KeyStore.getInstance("JKS");
             keyStoreB.load(keyStoreFile, keyStorePassword);
             Certificate sideACert = keyStoreB.getCertificate(sideAAlias);
-
+            // decrypt AES key from conf file using our private key and gather information from conf file
             PrivateKey privKey = (PrivateKey)keyStoreB.getKey(sideBAlias, keyStorePassword);
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, privKey);
@@ -48,9 +48,9 @@ public class Decrypt {
             SecretKey sKey = new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
             AlgorithmParameters algParams = AlgorithmParameters.getInstance("AES");
             algParams.init(decodedAlgParams);
+            // decrypt encrypted message
             cipher = Cipher.getInstance("AES/CTR/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, sKey, algParams);
-
             FileInputStream fis = new FileInputStream(encryptedTextName);
             CipherInputStream cis = new CipherInputStream(fis, cipher);
             FileOutputStream fos = new FileOutputStream(decryptedTextName);
@@ -61,6 +61,7 @@ public class Decrypt {
                 i = cis.read(b);
             }
             fos.close();
+            // gather plain text
             Scanner in = new Scanner(new FileReader(decryptedTextName));
             StringBuilder sb = new StringBuilder();
             while(in.hasNext()) {
@@ -68,6 +69,7 @@ public class Decrypt {
                 if (in.hasNextLine()) {sb.append(System.getProperty("line.separator")); }
 
             }
+            // verify digital signature
             String data = sb.toString();
             Signature sign = Signature.getInstance("SHA256withRSA");
             sign.initVerify(sideACert.getPublicKey());
